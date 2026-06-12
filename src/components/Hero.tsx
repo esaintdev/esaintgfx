@@ -12,7 +12,7 @@ export default function Hero() {
           />
         </div>
         <div>
-          <h1 className="mb-6">Website & Graphic Designer</h1>
+          <h1 className="mb-6">Esaint Michael</h1>
           <p className="mb-8 max-w-[600px] text-lg leading-relaxed text-zorox-text md:text-[24px] md:leading-relaxed md:tracking-[-1.2px]">
             I am a Professional Website & Graphic Designer. This website
             contains design works that I have produced over the past few years.

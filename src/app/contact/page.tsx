@@ -13,9 +13,9 @@ export default function ContactPage() {
             <div className="grid gap-12 md:grid-cols-2">
               <div className="space-y-10">
                 {[
-                  { label: "Address", value: "Jl. Contoh No. 123, Jakarta, Indonesia" },
-                  { label: "Email", value: "hello@zorox.com" },
-                  { label: "Phone", value: "(+62) 812 345 678" },
+                  { label: "Address", value: "Lagos, Nigeria" },
+                  { label: "Email", value: "esaint.designer@gmail.com" },
+                  { label: "Phone", value: "+2348121855275" },
                 ].map((item) => (
                   <div key={item.label}>
                     <h5 className="mb-2 uppercase tracking-[1.2px] text-zorox-accent">

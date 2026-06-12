@@ -29,8 +29,8 @@ export default function Header() {
       <div className="mx-auto flex max-w-[1140px] items-center justify-between px-4 py-4 lg:py-6">
         <Link href="/">
           <img
-            src="/logo-zorox.png"
-            alt="Zorox"
+            // src="/logo-zorox.png"
+            alt="esaint"
             className="h-10 w-auto"
           />
         </Link>
