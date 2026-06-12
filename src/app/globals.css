@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-zorox-primary: #DEF29B;
+  --color-zorox-secondary: #012F2B;
+  --color-zorox-text: #6D6D6D;
+  --color-zorox-accent: #FF7536;
+  --color-zorox-bg: #F7F5F0;
+  --color-zorox-white: #FFFFFF;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-zorox-bg);
+    color: var(--color-zorox-text);
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -1.2px;
+  }
+
+  h1 {
+    color: var(--color-zorox-secondary);
+    font-size: 96px;
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -5px;
+  }
+
+  h2 {
+    color: var(--color-zorox-secondary);
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -4px;
+  }
+
+  h3 {
+    color: var(--color-zorox-secondary);
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -2.2px;
+  }
+
+  h4 {
+    color: var(--color-zorox-secondary);
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -2.2px;
+  }
+
+  h5 {
+    color: var(--color-zorox-secondary);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -1.2px;
+  }
+
+  @media (max-width: 1024px) {
+    body { font-size: 18px; }
+    h1 { font-size: 64px; }
+    h2 { font-size: 56px; }
+    h3 { font-size: 32px; }
+    h4 { font-size: 28px; }
+  }
+
+  @media (max-width: 767px) {
+    h1 { font-size: 56px; }
+    h2 { font-size: 48px; }
+  }
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: typingBounce 1.4s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
