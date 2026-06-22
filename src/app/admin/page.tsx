@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import ContentManager from "@/components/admin/ContentManager";
+import ConfirmModal from "@/components/admin/ConfirmModal";
+import Toaster from "@/components/admin/Toaster";
+import { toast } from "@/components/admin/toast";
 
 type Conversation = {
   id: string;
@@ -48,7 +51,7 @@ export default function AdminPage() {
   const [visitorTyping, setVisitorTyping] = useState(false);
   const [search, setSearch] = useState("");
   const [showDeleted, setShowDeleted] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [showCanned, setShowCanned] = useState(false);
   const [tab, setTab] = useState<"chats" | "services" | "experience" | "skills" | "portfolio" | "testimonials" | "blog">("chats");
   const [cannedReplies, setCannedReplies] = useState<string[]>([]);
@@ -99,12 +102,13 @@ export default function AdminPage() {
       ? supabase.auth.signInWithPassword({ email, password })
       : supabase.auth.signUp({ email, password }));
     if (error) {
-      alert(error.message);
+      toast(error.message, "error");
     } else if (data.session) {
       setSession(data.session);
       setAdminEmail(data.session.user?.email || "Admin");
+      toast("Signed in successfully", "success");
     } else {
-      alert("Check your email for the confirmation link.");
+      toast("Check your email for the confirmation link.", "info");
     }
     setLoading(false);
   }
@@ -218,8 +222,9 @@ export default function AdminPage() {
   async function deleteConversation(cid: string) {
     if (!supabase) return;
     await updateConversationStatus(cid, "deleted");
-    setConfirmDelete(false);
+    setConfirmDeleteId(null);
     setSelected(null);
+    toast("Conversation deleted", "success");
   }
 
   async function sendReply(e: React.FormEvent) {
@@ -411,32 +416,15 @@ export default function AdminPage() {
                 <p className="text-xs text-zorox-text/60">{selectedConv?.visitor_email || "No email"}</p>
               </div>
               <div className="flex items-center gap-2">
-                {confirmDelete ? (
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => selected && deleteConversation(selected)}
-                      className="rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-700"
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      onClick={() => setConfirmDelete(false)}
-                      className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-zorox-text transition-colors hover:bg-gray-200"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setConfirmDelete(true)}
-                    className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100"
-                    title="Delete conversation"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    </svg>
-                  </button>
-                )}
+                <button
+                  onClick={() => selected && setConfirmDeleteId(selected)}
+                  className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100"
+                  title="Delete conversation"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
                 <button
                   onClick={() => {
                     if (!selected) return;
@@ -546,6 +534,14 @@ export default function AdminPage() {
                 </button>
               </div>
             )}
+            <ConfirmModal
+              open={!!confirmDeleteId}
+              title="Delete conversation"
+              message="Are you sure you want to delete this conversation? It will be hidden from the list."
+              confirmLabel="Delete"
+              onConfirm={() => confirmDeleteId && deleteConversation(confirmDeleteId)}
+              onCancel={() => setConfirmDeleteId(null)}
+            />
           </>
         )
       ) : (
@@ -554,14 +550,15 @@ export default function AdminPage() {
             services: { title: "Service", table: "services", fields: [{name:"title",label:"Title",type:"text",required:true},{name:"description",label:"Description",type:"textarea",required:true},{name:"icon",label:"Icon path",type:"text",placeholder:"/icon-xyz.png"},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
             experience: { title: "Experience", table: "experience_items", fields: [{name:"period",label:"Period",type:"text",required:true,placeholder:"2014-2016"},{name:"title",label:"Title",type:"text",required:true},{name:"description",label:"Description",type:"textarea",required:true},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
             skills: { title: "Skill", table: "skills", fields: [{name:"label",label:"Skill name",type:"text",required:true},{name:"percentage",label:"Percentage",type:"number",required:true},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
-            portfolio: { title: "Portfolio item", table: "portfolio_items", fields: [{name:"title",label:"Title",type:"text",required:true},{name:"img",label:"Image path",type:"text",placeholder:"/img-work.png"},{name:"description",label:"Description",type:"textarea",placeholder:"Project overview"},{name:"client",label:"Client",type:"text",placeholder:"Client name"},{name:"year",label:"Year",type:"text",placeholder:"2024"},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
-            testimonials: { title: "Testimonial", table: "testimonials", fields: [{name:"name",label:"Client name",type:"text",required:true},{name:"quote",label:"Quote",type:"textarea",required:true},{name:"img",label:"Image path",type:"text",placeholder:"/img-client.png"},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
-            blog: { title: "Blog post", table: "blog_posts", fields: [{name:"title",label:"Title",type:"text",required:true},{name:"excerpt",label:"Excerpt",type:"textarea",required:true},{name:"img",label:"Image path",type:"text",placeholder:"/img-news.png"},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
+            portfolio: { title: "Portfolio item", table: "portfolio_items", fields: [{name:"title",label:"Title",type:"text",required:true},{name:"img",label:"Image",type:"image"},{name:"description",label:"Description",type:"textarea",placeholder:"Project overview"},{name:"client",label:"Client",type:"text",placeholder:"Client name"},{name:"year",label:"Year",type:"text",placeholder:"2024"},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
+            testimonials: { title: "Testimonial", table: "testimonials", fields: [{name:"name",label:"Client name",type:"text",required:true},{name:"quote",label:"Quote",type:"textarea",required:true},{name:"img",label:"Image",type:"image"},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
+            blog: { title: "Blog post", table: "blog_posts", fields: [{name:"title",label:"Title",type:"text",required:true},{name:"excerpt",label:"Excerpt",type:"textarea",required:true},{name:"img",label:"Image",type:"image"},{name:"sort_order",label:"Order",type:"number"}], orderBy: "sort_order" },
           };
           const c = configs[tab];
           return c ? <ContentManager title={c.title} table={c.table} fields={c.fields} orderBy={c.orderBy} /> : null;
         })()
       )}
+        <Toaster />
       </div>
     </div>
   );
